@@ -145,6 +145,9 @@ config:
       simpleConfigUpdate:
         admin: gin
         default: localgov_scarfolk
+    system.site:
+      simpleConfigUpdate:
+        page.front: '/node'
     # Update core date settings
     core.date_format.long:
       simpleConfigUpdate:
