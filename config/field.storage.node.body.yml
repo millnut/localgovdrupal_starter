@@ -1,3 +1,6 @@
+# This is required due to https://www.drupal.org/node/3489785,
+# https://www.drupal.org/project/drupal/issues/3477043 and
+# https://www.drupal.org/project/drupal/issues/3447617
 langcode: en
 status: true
 dependencies:
