@@ -145,9 +145,6 @@ config:
       simpleConfigUpdate:
         admin: gin
         default: localgov_scarfolk
-    system.site:
-      simpleConfigUpdate:
-        page.404: '/404'
     # Update core date settings
     core.date_format.long:
       simpleConfigUpdate:
