@@ -1,0 +1,171 @@
+name: LocalGov Drupal Starter
+type: Site
+description: A simple template with just the basics. Bring your own design, and build what you need.
+recipes:
+  - core/recipes/core_recommended_maintenance
+  - core/recipes/core_recommended_performance
+install:
+  - editor
+  - filter
+  - menu_link_content
+  # The rest of these are in Standard.
+  - inline_form_errors
+  - config
+  - views_ui
+config:
+  # If the config we're importing already exists, we don't really care
+  # what it looks like.
+  strict: false
+  import:
+    image:
+      - image.style.large
+      - image.style.thumbnail
+    user:
+      - views.view.user_admin_people
+  actions:
+    dashboard.dashboard.welcome:
+      addComponentsToLayout:
+        # The list of Canvas pages.
+        - section: 0
+          position: 0
+          component:
+            region:
+              layout_twocol_section: first
+            default_region: content
+            configuration:
+              id: 'views_block:recent_pages-block_recent_pages'
+              label: ''
+              label_display: visible
+              provider: views
+              context_mapping: { }
+              views_label: ''
+              items_per_page: null
+        # The "recent content" block.
+        - section: 0
+          position: 1
+          component:
+            region:
+              layout_twocol_section: first
+            default_region: content
+            configuration:
+              id: 'views_block:recent_content-block_recent_content'
+              label: ''
+              label_display: visible
+              provider: views
+              context_mapping: { }
+              views_label: ''
+              items_per_page: null
+    system.site:
+      simpleConfigUpdate:
+        page.404: '/404'
+    system.theme:
+      simpleConfigUpdate:
+        default: mercury
+    user.role.content_editor:
+      # @todo: Convert to an ECA model which grants media-related permissions
+      # if this role exists.
+      grantPermissionsForEachMediaType:
+        - 'create %bundle media'
+        - 'delete any %bundle media'
+        - 'edit any %bundle media'
+      grantPermissions:
+        - 'create canvas_page'
+        - 'delete canvas_page'
+        - 'edit canvas_page'
+    project_browser.admin_settings:
+      simpleConfigUpdate:
+        enabled_sources:
+          recommended:
+            # @see recommended.yml
+            uri: 'https://git.drupalcode.org/api/v4/projects/167158/repository/files/recommended.yml/raw?ref=HEAD'
+            ttl: 1
+          drupalorg_jsonapi: []
+        default_source: recommended
+    # @todo Figure out what to do with this -- keep it in the recipe?
+    #   Move it elsewhere?
+    # Enable the name field in the entity form so it can be modified.
+    core.entity_form_display.media.document.*:
+      setComponent:
+        name: name
+        options:
+          type: string_textfield
+          weight: -1
+          region: content
+    # @todo Move all of this to content_type_base if we add Canvas as a dependency.
+    # Enable LinkIt and alignment for Canvas's included filter formats and
+    # editors. This needs to be done after the theme has been set so that the
+    # CKEditor 5 module can properly resolve library and plugin definitions.
+    editor.editor.canvas_html_block:
+      addItemToToolbar:
+        item_name: alignment
+        position: 3
+      setProperties:
+        settings.plugins.linkit_extension:
+          linkit_enabled: true
+          linkit_profile: default
+        settings.plugins.ckeditor5_alignment:
+          enabled_alignments:
+            - center
+            - justify
+            - left
+            - right
+    editor.editor.canvas_html_inline:
+      setProperties:
+        settings.plugins.linkit_extension:
+          linkit_enabled: true
+          linkit_profile: default
+    filter.format.canvas_html_block:
+      setFilterConfigs:
+        - instance_id: filter_html
+          configuration:
+            id: filter_html
+            provider: filter
+            status: true
+            weight: 0
+            settings:
+              allowed_html: '<strong> <em> <u> <a href data-entity-type data-entity-uuid data-entity-substitution> <p class="text-align-left text-align-center text-align-right text-align-justify"> <br> <ul> <ol> <li>'
+              filter_html_help: false
+              filter_html_nofollow: false
+        - instance_id: linkit
+          configuration:
+            id: linkit
+            provider: linkit
+            status: true
+            weight: 0
+            settings:
+              title: false
+    filter.format.canvas_html_inline:
+      setFilterConfigs:
+        - instance_id: filter_html
+          configuration:
+            id: filter_html
+            provider: filter
+            status: true
+            weight: 0
+            settings:
+              allowed_html: '<strong> <em> <u> <a href data-entity-type data-entity-uuid data-entity-substitution> <p> <br> <ul> <ol> <li>'
+              filter_html_help: false
+              filter_html_nofollow: false
+        - instance_id: linkit
+          configuration:
+            id: linkit
+            provider: linkit
+            status: true
+            weight: 0
+            settings:
+              title: false
+    # Add a Linkit matcher for Canvas pages.
+    linkit.linkit_profile.default:
+      addMatcher:
+        id: 'entity:canvas_page'
+        settings:
+          metadata: 'by [canvas_page:owner] on [canvas_page:created:date:custom:j M Y]'
+          bundles: null
+          group_by_bundle: null
+          substitution_type: canonical
+          limit: 100
+        weight: -10
+extra:
+  recipe_installer_kit:
+    finish_url: '/'
+
